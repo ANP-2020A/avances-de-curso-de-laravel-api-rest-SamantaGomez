@@ -7,21 +7,21 @@ use Illuminate\Support\Facades\Auth;
 
 class Comment extends Model
 {
-    protected $fillable = ['text'];
     public static function boot()
     {
         parent::boot();
-        static::creating(function ($article)
+        static::creating(function ($comment)
         {
-            $article->user_id = Auth::id();
+            $comment->user_id = Auth::id();
         });
     }
+
     public function user()
     {
         return $this->belongsTo('App\User');
     }
     public function article()
     {
-        return $this->belongsTo('App\Article');
+        return $this->hasMany('App\Article');
     }
 }
