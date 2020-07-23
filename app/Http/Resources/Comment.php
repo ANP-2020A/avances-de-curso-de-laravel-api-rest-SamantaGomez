@@ -2,11 +2,11 @@
 
 namespace App\Http\Resources;
 
-use App\Category;
 use App\User;
+use App\Article;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class Article extends JsonResource
+class Comment extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -18,15 +18,11 @@ class Article extends JsonResource
     {
         return [
             'id' => $this->id,
-            'title' => $this->title,
-            'body' => $this->body,
-            'user' => User::find($this->user_id),
-            'category' => Category::find($this->category_id),
-            'image' => $this->image,
+            'text' => $this->title,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-
-
+            'article' => Article::find($this->article_id),
+            'user' => User::find($this->user_id),
         ];
     }
 }
