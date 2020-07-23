@@ -27,16 +27,27 @@ class ArticleController extends Controller
     {
         return response()->json(new ArticleResource($article), 200);
     }
+    public function image(Article $article)
+    {
+        return response()->download(public_path(Storage::url($article->image)),
+            $article->title);
+    }
     public function store(Request $request)
     {
         $request->validate([
             'title' => 'required|string|unique:articles|max:255',
             'body' => 'required',
             'category_id' => 'required|exists:categories',
+            'image' => 'required|image|dimensions:min_width=200,min_height=200',
         ], self::$messages);
+        $article = new Article($request->all());
+        $path = $request->image->store('public/articles');
+    //    $path = $request->image->store('public/articles', $request->user()->id . '_' . $article->title . '.' . $request->image->extension()););
 
-        $article = Article::create($request->all());
-        return response()->json($article, 201);
+        $article->image= $path;
+        $article->save();
+        //$article = Article::create($request->all());
+        return response()->json(new ArticleResourse($article), 201);
     }
     public function update(Request $request, Article $article)
     {
