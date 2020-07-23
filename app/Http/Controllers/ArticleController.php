@@ -9,6 +9,16 @@ use Illuminate\Http\Request;
 
 class ArticleController extends Controller
 {
+    //private static $rules = [
+        //'title' => 'required|string|unique:articles|max:255',
+        //'body' => 'required',
+        //'category_id' => 'required|exists:categories',
+    //];
+    private static $messages = [
+        'required' => 'El campo :attribute es obligatorio.',
+        'body.required' => 'El body no es valido.',
+
+    ];
     public function index()
     {
         return new ArticleCollection(Article::paginate(25));
@@ -17,13 +27,36 @@ class ArticleController extends Controller
     {
         return response()->json(new ArticleResource($article), 200);
     }
+    public function image(Article $article)
+    {
+        return response()->download(public_path(Storage::url($article->image)),
+            $article->title);
+    }
     public function store(Request $request)
     {
-        $article = Article::create($request->all());
-        return response()->json($article, 201);
+        $request->validate([
+            'title' => 'required|string|unique:articles|max:255',
+            'body' => 'required',
+            'category_id' => 'required|exists:categories',
+            'image' => 'required|image|dimensions:min_width=200,min_height=200',
+        ], self::$messages);
+        $article = new Article($request->all());
+        $path = $request->image->store('public/articles');
+    //    $path = $request->image->store('public/articles', $request->user()->id . '_' . $article->title . '.' . $request->image->extension()););
+
+        $article->image= $path;
+        $article->save();
+        //$article = Article::create($request->all());
+        return response()->json(new ArticleResourse($article), 201);
     }
     public function update(Request $request, Article $article)
     {
+        $request->validate([
+            'title' => 'required|string|unique:articles,title'.$article->id.'|max:255',
+            'body' => 'required',
+            'category_id' => 'required|exists:categories',
+        ],self::$messages);
+
         $article->update($request->all());
         return response()->json($article, 200);
     }

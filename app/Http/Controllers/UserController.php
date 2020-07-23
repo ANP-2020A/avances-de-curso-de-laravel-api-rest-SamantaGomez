@@ -43,7 +43,7 @@ class UserController extends Controller
             'email' => $request->get('email'),
             'password' => Hash::make($request->get('password')),
             ]);
-        $token = JWTAuth::fromUser($user);
+        $token = (new \Tymon\JWTAuth\JWTAuth)->fromUser($user);
         return response()->json(compact('user','token'),201);
     }
     public function getAuthenticatedUser()
