@@ -69,7 +69,7 @@ class ArticleController extends Controller
     }
     public function delete(Request $request, Article $article)
     {
-        this->authorize('delete', $article);
+        $this->authorize('delete', $article);
 
         $article->delete();
         return response()->json(null, 204);
